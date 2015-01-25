@@ -56,9 +56,9 @@
                     }
                 }
             } else {
-                setTimeout( function () {
-                    removeNotice( id, _formats[ format ] );
-                }, ( format === "toast" ? 2500 : 5000 ) );
+                //setTimeout( function () {
+                //    removeNotice( id, _formats[ format ] );
+                //}, ( format === "toast" ? 2500 : 5000 ) );
             }
         }
     };
@@ -82,19 +82,32 @@
     };
 
     let updateNotice = ( id, args ) => {
+        var $notice = findNotice( id );
 
+        if ( args.message ) {
+            $notice.find( ".notice-message" )
+                .html( args.message );
+        }
+
+        if ( args.type ) {
+            $notice.removeClass( "warning info success error" )
+                .addClass( _types[ args.type ].className )
+                .find( ".notice-icon" )
+                .html( "<span class='" + _types[ args.type ].icon + "'></span>" );
+
+        }
     };
 
     let render = ( notice ) => {
         var $container = getListContainer( notice.format.className ),
             html = `<div class='notice-list-item ${notice.type.className} animated ${ notice.format.enterAnimation }' data-notice-id='${notice.id }'>
-                        <div class='notice-icon ${notice.type.icon}'></div>
+                        <div class='notice-icon'><span class='${notice.type.icon}'></span></div>
                         <div class='notice-message'>${notice.message}</div>
                         <div class='notice-dismiss' data-notice-id='${notice.id }' data-notice-format='${notice.format.key}'>x</div>
                     </div>`;
 
-        console.log( "appending: ", $(html));
-        console.log( "to: ", $container);
+        console.log( "appending: ", $( html ) );
+        console.log( "to: ", $container );
         $container.append( html );
     };
 
@@ -114,10 +127,10 @@
     $( function () {
         $body.on( "click", ".notice-dismiss", function () {
             var $sender = $( this ),
-                id =  $sender.data( "notice-id" ),
-                format = _formats[$sender.data( "notice-format" ) ];
+                id = $sender.data( "notice-id" ),
+                format = _formats[ $sender.data( "notice-format" ) ];
 
-            removeNotice( id, format);
+            removeNotice( id, format );
         } );
     } );
 

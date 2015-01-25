@@ -4,7 +4,10 @@
   box-sizing: border-box;
   min-height: 3em;
 
-
+  -webkit-transition: all 250ms;
+  -moz-transition: all 250ms;
+  -o-transition: all 250ms;
+  transition: all 250ms;
 
   &.success {
     background: $colorSuccess;
@@ -55,7 +58,11 @@
 
     .notice-list-item {
       @extend .base-notice-list-item;
+      border-radius: 3px;
       padding: .5em;
+      -webkit-box-shadow: 0 0 5px #ddd;
+      -moz-box-shadow: 0 0 5px #ddd;
+      box-shadow: 0 0 5px #ddd;
 
       .notice-icon {
         padding-top: .2em;

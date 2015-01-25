@@ -29,12 +29,25 @@
     Notice.show(notice1);
 
     var notice2 = {
-        message: "Hi there!",
-        type: "success",
-        format: "barTop"
+        message: "Working...",
+        type: "info",
+        format: "barTop",
+        autoRemove: false
     };
 
-    Notice.show(notice2);
+    var n = Notice.show(notice2);
+
+    setTimeout(function () {
+        n.update({
+            message: "Important Update!",
+            type: "success"
+        });
+
+        setTimeout(function () {
+            n.remove();
+        }, 2000);
+
+    }, 2000);
 </script>
 </body>
 </html>

@@ -58,11 +58,7 @@
             updateNotice(id, newArgs);
           }
         };
-      } else {
-        setTimeout(function () {
-          removeNotice(id, _formats[format]);
-        }, format === "toast" ? 2500 : 5000);
-      }
+      } else {}
     }
   };
 
@@ -81,11 +77,21 @@
     }, 500);
   };
 
-  var updateNotice = function (id, args) {};
+  var updateNotice = function (id, args) {
+    var $notice = findNotice(id);
+
+    if (args.message) {
+      $notice.find(".notice-message").html(args.message);
+    }
+
+    if (args.type) {
+      $notice.removeClass("warning info success error").addClass(_types[args.type].className).find(".notice-icon").html("<span class='" + _types[args.type].icon + "'></span>");
+    }
+  };
 
   var render = function (notice) {
     var $container = getListContainer(notice.format.className),
-        html = "<div class='notice-list-item " + notice.type.className + " animated " + notice.format.enterAnimation + "' data-notice-id='" + notice.id + "'>\n                        <div class='notice-icon " + notice.type.icon + "'></div>\n                        <div class='notice-message'>" + notice.message + "</div>\n                        <div class='notice-dismiss' data-notice-id='" + notice.id + "' data-notice-format='" + notice.format.key + "'>x</div>\n                    </div>";
+        html = "<div class='notice-list-item " + notice.type.className + " animated " + notice.format.enterAnimation + "' data-notice-id='" + notice.id + "'>\n                        <div class='notice-icon'><span class='" + notice.type.icon + "'></span></div>\n                        <div class='notice-message'>" + notice.message + "</div>\n                        <div class='notice-dismiss' data-notice-id='" + notice.id + "' data-notice-format='" + notice.format.key + "'>x</div>\n                    </div>";
 
     console.log("appending: ", $(html));
     console.log("to: ", $container);
@@ -115,3 +121,6 @@
   });
 
 })(this, jQuery);
+//setTimeout( function () {
+//    removeNotice( id, _formats[ format ] );
+//}, ( format === "toast" ? 2500 : 5000 ) );
