@@ -1,8 +1,8 @@
 "use strict";
 
-(function (window, document) {
+(function (window, $) {
   var _uniquId = 0,
-      _body = document.getElementsByTagName("body")[0],
+      $body = $("body"),
       _types = {
     success: {
       icon: "fa fa-thumbs-up",
@@ -20,6 +20,20 @@
       icon: "fa fa-times",
       className: "error"
     }
+  },
+      _formats = {
+    toast: {
+      key: "toast",
+      className: "toast",
+      enterAnimation: "fadeInUp",
+      exitAnimation: "fadeOutDown"
+    },
+    barTop: {
+      key: "barTop",
+      className: "bar-top",
+      enterAnimation: "fadeInDown",
+      exitAnimation: "fadeOutUp"
+    }
   };
 
   var notice = {
@@ -30,76 +44,74 @@
 
       render({
         message: args.message,
-        format: args.format,
         type: _types[args.type],
+        format: _formats[format],
         id: id
       });
 
       if (args.autoRemove === false) {
         return {
           remove: function remove() {
-            removeNotice(id, format);
+            removeNotice(id, _formats[format]);
           },
           update: function update(newArgs) {
             updateNotice(id, newArgs);
           }
         };
+      } else {
+        setTimeout(function () {
+          removeNotice(id, _formats[format]);
+        }, format === "toast" ? 2500 : 5000);
       }
-
-      return null;
     }
   };
 
   window.Notice = notice;
 
-  var removeNotice = function (id, format) {};
+  var removeNotice = function (id, format) {
+    var $el = findNotice(id);
+
+    $el.removeClass(format.enterAnimation);
+    $el.addClass(format.exitAnimation);
+
+    if (format.key.contains("top")) $el.slideUp(250);else $el.slideDown(250);
+
+    setTimeout(function () {
+      $el.remove();
+    }, 500);
+  };
 
   var updateNotice = function (id, args) {};
 
   var render = function (notice) {
-    var containerDiv = document.createElement("div"),
-        listItem = document.createElement("div"),
-        iconDiv = document.createElement("div"),
-        messageDiv = document.createElement("div"),
-        dismissDiv = document.createElement("div");
+    var $container = getListContainer(notice.format.className),
+        html = "<div class='notice-list-item " + notice.type.className + " animated " + notice.format.enterAnimation + "' data-notice-id='" + notice.id + "'>\n                        <div class='notice-icon " + notice.type.icon + "'></div>\n                        <div class='notice-message'>" + notice.message + "</div>\n                        <div class='notice-dismiss' data-notice-id='" + notice.id + "' data-notice-format='" + notice.format.key + "'>x</div>\n                    </div>";
 
-    containerDiv.className = "notice-container " + notice.format;
-
-    listItem.className = "notice-list-item " + notice.type.className;
-    listItem.setAttribute("data-notice-id", notice.id);
-
-    iconDiv.className = "notice-icon " + notice.type.icon;
-
-    messageDiv.className = "notice-message";
-    messageDiv.textContent = notice.message;
-
-    dismissDiv.className = "notice-dismiss";
-    dismissDiv.setAttribute("data-notice-id", notice.id);
-    dismissDiv.textContent = "x";
-
-    listItem.appendChild(iconDiv);
-    listItem.appendChild(messageDiv);
-    listItem.appendChild(dismissDiv);
-    containerDiv.appendChild(listItem);
-
-    document.body.appendChild(containerDiv);
-
-    console.log("rendering: ", containerDiv);
-    var allNotices = document.querySelector("[class*='notice-list-item']");
-    console.log("all notices: ", allNotices);
+    console.log("appending: ", $(html));
+    console.log("to: ", $container);
+    $container.append(html);
   };
 
   var findNotice = function (id) {
-    return document.querySelectorAll("[data-notice-id='" + id + "']")[0];
+    return $(".notice-list-item[data-notice-id='" + id + "']");
   };
 
-  var addClass = function (el, className) {
-    el.className += " " + className;
-    return el;
+  var getListContainer = function (format) {
+    var test = $(".notice-container." + format);
+    if (test.length) return test;
+
+    $body.append("<div class='notice-container " + format + "'></div>");
+    return $(".notice-container." + format);
   };
 
-  var removeClass = function (el, className) {
-    el.className = el.className.replace(className, "");
-    return el;
-  };
-})(this, document);
+  $(function () {
+    $body.on("click", ".notice-dismiss", function () {
+      var $sender = $(this),
+          id = $sender.data("notice-id"),
+          format = _formats[$sender.data("notice-format")];
+
+      removeNotice(id, format);
+    });
+  });
+
+})(this, jQuery);
