@@ -7,6 +7,7 @@ var gulp = require("gulp"),
     uglify = require("gulp-uglify" ),
     to5 = require('gulp-6to5'),
     livereload = require("gulp-livereload"),
+    connect = require('gulp-connect'),
     karma = require('karma').server;
 
 gulp.task("css", function () {
@@ -20,8 +21,8 @@ gulp.task("css", function () {
 });
 
 gulp.task("sass", function () {
-    gulp.src(["./sass/*.sass", "./sass/lib/notice.sass"])
-        .pipe(sass())
+    gulp.src(["./sass/*.scss"])
+        .pipe(sass({errLogToConsole: true}))
         .pipe(gulp.dest("./css"));
 });
 
@@ -44,16 +45,16 @@ gulp.task('karma', function (done) {
 });
 
 gulp.task("reload", function (  ) {
-    gulp.src("./examples/**/*.html").pipe(livereload());
+    gulp.src("./index.html").pipe(livereload());
 });
 
 gulp.task("watch", function () {
     var server = livereload();
 
-    gulp.watch("./css/basis.css", ["css"]);
-    gulp.watch("./sass/**/*.sass", ["sass"]);
+    gulp.watch("./css/notice.css", ["css"]);
+    gulp.watch("./sass/*.scss", ["sass"]);
     gulp.watch("./js/src/**/*.js", ["build-js"]);
-    gulp.watch("./examples/**/*.html", ["reload"]);
+    gulp.watch("./index.html", ["reload"]);
 });
 
 gulp.task("default", function() {
